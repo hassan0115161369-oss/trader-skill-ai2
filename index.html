@@ -1,0 +1,85 @@
+<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>Trader Skill AI</title>
+<style>
+:root{color-scheme:dark;--bg:#050a14;--cd:rgba(22,38,64,.55);--tx:#e6f1ff;--mu:#8aa0bd;--c:#00F5D4;--b:#00BBF9;--r:#ff5d73;--g:#2ee59d;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(circle at 50% -10%,#0d2a4a,var(--bg) 60%);color:var(--tx);font:15px/1.5 system-ui,"Segoe UI",Tahoma,sans-serif;min-height:100vh}
+button,input,select,textarea{font:inherit;color:inherit}
+.w{max-width:760px;margin:auto;padding:12px 14px 80px}
+.cd{background:var(--cd);backdrop-filter:blur(10px);border:1px solid rgba(0,187,249,.25);border-radius:16px;padding:14px;margin:0 0 12px}
+.cd h3{margin:0 0 6px;font-size:14px;color:var(--mu);font-weight:600;display:flex;justify-content:space-between}
+.big{font-size:26px;font-weight:700}.g{color:var(--g)}.r{color:var(--r)}.mu{color:var(--mu);font-size:13px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.grid>.cd{margin:0}
+.btn{background:linear-gradient(135deg,var(--c),var(--b));color:#031018;border:0;border-radius:12px;padding:10px 16px;font-weight:700;cursor:pointer}
+.btn.o{background:none;color:var(--c);border:1px solid var(--c)}.btn.d{background:var(--r);color:#fff}
+input,select,textarea{width:100%;background:#0a1730;border:1px solid #1d3556;border-radius:10px;padding:10px;margin:4px 0 10px}
+input:focus,button:focus-visible{outline:2px solid var(--c)}
+.bar{position:fixed;bottom:0;inset-inline:0;display:flex;justify-content:space-around;background:rgba(5,10,20,.92);border-top:1px solid #1d3556;padding:8px 4px calc(8px + env(safe-area-inset-bottom,0px))}
+.bar button{background:none;border:0;color:var(--mu);padding:6px 8px;font-size:13px;cursor:pointer}.bar .on{color:var(--c);font-weight:700}
+.tag{font-size:11px;padding:2px 8px;border-radius:99px;border:1px solid var(--b);color:var(--b)}.tag.x{border-color:var(--r);color:var(--r)}
+canvas{width:100%;height:240px;display:block}
+#sp,#au{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;z-index:9;padding:20px}
+#sp{transition:opacity .6s}#sp svg{filter:drop-shadow(0 0 18px #00F5D4)}
+#au form,#au .f{width:min(340px,100%)}
+.lg{max-height:150px;overflow:auto;font-size:12px;color:var(--mu)}
+@media(prefers-reduced-motion:reduce){#sp{transition:none}}
+</style></head><body>
+<div id="sp"><svg id="logo" width="120" height="120" viewBox="0 0 120 120"><rect width="120" height="120" rx="28" fill="#08142a" stroke="#00BBF9" stroke-width="2"/><path d="M14 30c10 14 20 18 30 18M106 30c-10 14-20 18-30 18" stroke="#00F5D4" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M34 44h52l-6 40-20 18-20-18z" fill="#0d1d3a" stroke="#00BBF9" stroke-width="3"/><circle cx="46" cy="64" r="5" fill="#00F5D4"/><circle cx="74" cy="64" r="5" fill="#00F5D4"/><path d="M50 90h20" stroke="#00BBF9" stroke-width="3"/></svg><div class="big" style="color:var(--c)">Trader Skill AI</div><div class="mu">AI Financial Intelligence</div></div>
+<div id="au" hidden></div><div class="w" id="app" hidden></div><nav class="bar" id="nv" hidden></nav>
+<script>
+const $=s=>document.querySelector(s),ld=k=>{try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},sv=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+const D={ar:{dash:"الرئيسية",chart:"الشارت",bot:"الروبوت",test:"اختبار",set:"الإعدادات",mkt:"حالة السوق",trend:"الاتجاه",vol:"التقلب (ATR)",sent:"المشاعر الفنية",dq:"جودة البيانات",acc:"الحساب",brk:"المنصات",up:"صاعد",dn:"هابط",nu:"محايد",demo:"بيانات تجريبية محاكاة",bal:"الرصيد",start:"تشغيل",pause:"إيقاف مؤقت",stop:"إيقاف",ml:"أقصى خسارة يومية",tg:"هدف الربح اليومي",nl:"خسائر متتالية قبل التبريد",real:"فعّل الوضع الحقيقي (قفل مزدوج)",rl:"اكتب REAL للتأكيد",cool:"تبريد حتى",run:"شغّل الاختبار",log:"السجل",em:"البريد الإلكتروني",pw:"كلمة المرور",li:"دخول",rg:"حساب جديد",lo:"خروج",err:"بيانات غير صحيحة أو الحساب موجود",ex:"تصدير الصفقات (CSV)",off:"غير متصل",nb:"ربط المنصات الفعلي (Deriv, MT5, Binance, Quotex) والتنبيهات عبر Telegram وفلتر الأخبار يحتاجون خادمًا وسيطًا، ولا يعملان داخل صفحة ويب. هذه النسخة تحاكي الدورة كاملة على بيانات تجريبية.",blk:"الوضع الحقيقي مقفل: لا يوجد وسيط متصل، لن يُرسل أي أمر.",top:"نقل للأعلى"},
+en:{dash:"Home",chart:"Chart",bot:"Bot",test:"Backtest",set:"Settings",mkt:"Market",trend:"Trend",vol:"Volatility (ATR)",sent:"Technical sentiment",dq:"Data quality",acc:"Account",brk:"Brokers",up:"Bullish",dn:"Bearish",nu:"Neutral",demo:"DEMO simulated data",bal:"Balance",start:"Start",pause:"Pause",stop:"Stop",ml:"Max daily loss",tg:"Daily profit target",nl:"Losses before cool-down",real:"Enable Real mode (double lock)",rl:"Type REAL to confirm",cool:"Cool-down until",run:"Run backtest",log:"Activity log",em:"Email",pw:"Password",li:"Log in",rg:"Sign up",lo:"Log out",err:"Wrong details or account exists",ex:"Export trades (CSV)",off:"OFFLINE",nb:"Live broker links (Deriv, MT5, Binance, Quotex), Telegram alerts and the news guard need a backend server and cannot run inside a web page. This build simulates the full cycle on demo data.",blk:"Real mode is locked: no broker is connected, no order will be sent.",top:"Move up"}};
+const T=k=>D[lang][k];let lang=ld('lang')||'ar',user=ld('sess'),tab='dash',cs=[],px=100,tk=0,bal=1e4,tr=[],pos=null,st='stop',ml=200,tg=300,nl=3,cd=0,day=0,cl=0,lg=[],mode='demo',order=ld('ord')||['mkt','trend','vol','sent','dq','acc','brk'],btr='';
+const sma=(a,n)=>a.slice(-n).reduce((x,y)=>x+y,0)/Math.min(n,a.length),cls=()=>cs.map(c=>c.c);
+function rsi(a,n=14){let g=0,l=0;a=a.slice(-n-1);for(let i=1;i<a.length;i++){const d=a[i]-a[i-1];d>0?g+=d:l-=d}return l?100-100/(1+g/l):100}
+const atr=(c,n=14)=>c.slice(-n).reduce((s,x)=>s+x.h-x.l,0)/Math.min(n,c.length)||.01;
+function sig(a){if(a.length<22)return 0;const f=sma(a,5),s=sma(a,20),pf=sma(a.slice(0,-1),5),ps=sma(a.slice(0,-1),20),r=rsi(a);return pf<=ps&&f>s&&r<70?1:pf>=ps&&f<s&&r>30?-1:0}
+const nc=o=>({o,h:o,l:o,c:o}),now=()=>new Date().toLocaleTimeString(),say=m=>{lg.unshift(now()+" "+m);lg=lg.slice(0,40)};
+function step(){px=Math.max(1,px*(1+(Math.random()-.5)*.004+Math.sin(Date.now()/60000)*.0004));const c=cs[cs.length-1];c.c=px;c.h=Math.max(c.h,px);c.l=Math.min(c.l,px)}
+cs.push(nc(px));for(let i=0;i<900;i++){step();if(i%10==9)cs.push(nc(px))}
+function shut(m){st='stop';say(m)}
+function close(x){const p=pos.d*(x-pos.e)*pos.u;bal+=p;day+=p;tr.push({t:now(),d:pos.d>0?'BUY':'SELL',e:pos.e.toFixed(3),x:x.toFixed(3),pnl:p.toFixed(2)});say((p>=0?"+":"")+p.toFixed(2));pos=null;cl=p<0?cl+1:0;
+if(day<=-ml)shut("Max daily loss");else if(day>=tg)shut("Daily target");else if(cl>=nl){cd=Date.now()+9e5;cl=0;say("Cool-down 15m")}}
+function tick(){step();tk++;if(pos&&(pos.d>0?px<=pos.sl||px>=pos.tp:px>=pos.sl||px<=pos.tp))close(px);
+if(tk%10==0){if(st=='run'&&!pos&&Date.now()>=cd){const s=sig(cls());if(s){const a=atr(cs);pos={d:s,e:px,sl:px-s*2*a,tp:px+s*3*a,u:bal*.01/(2*a)};say((s>0?"BUY ":"SELL ")+px.toFixed(3))}}cs.push(nc(px));if(cs.length>1500)cs.shift()}
+upd()}
+function upd(){const a=cls(),p0=a[a.length-11]||px,ch=(px/p0-1)*100,s20=sma(a,20),s50=sma(a,50),r=rsi(a),m={mp:px.toFixed(3),mc:(ch>=0?"+":"")+ch.toFixed(2)+"%",tr:s20>s50?T('up'):s20<s50?T('dn'):T('nu'),vo:atr(cs).toFixed(3),se:r>55?T('up'):r<45?T('dn'):T('nu'),rs:"RSI "+r.toFixed(1),ba:bal.toFixed(2),dp:day.toFixed(2),bs:st+(Date.now()<cd?" ⏳ "+new Date(cd).toLocaleTimeString():"")+(pos?" • "+(pos.d>0?"BUY":"SELL"):""),lg:lg.join("<br>")};
+for(const k in m){const e=$("#"+k);if(e)e.innerHTML=m[k]}if(tab=='chart')draw()}
+function draw(){const c=$("#cv");if(!c)return;const w=c.clientWidth,h=240,d=devicePixelRatio||1;c.width=w*d;c.height=h*d;const x=c.getContext("2d");x.scale(d,d);const v=cs.slice(-60),hi=Math.max(...v.map(k=>k.h)),lo=Math.min(...v.map(k=>k.l)),y=p=>h-8-(p-lo)/(hi-lo||1)*(h-16),bw=w/60;
+v.forEach((k,i)=>{const u=k.c>=k.o;x.strokeStyle=x.fillStyle=u?"#2ee59d":"#ff5d73";const cx=i*bw+bw/2;x.beginPath();x.moveTo(cx,y(k.h));x.lineTo(cx,y(k.l));x.stroke();x.fillRect(cx-bw*.35,Math.min(y(k.o),y(k.c)),bw*.7,Math.max(1,Math.abs(y(k.o)-y(k.c))))});
+x.strokeStyle="#00BBF9";x.beginPath();const a=cls();v.forEach((k,i)=>{const n=cs.length-60+i,s=sma(a.slice(0,n+1),20);i?x.lineTo(i*bw+bw/2,y(s)):x.moveTo(bw/2,y(s))});x.stroke()}
+function bt(){let q=7,r=()=>(q=q*16807%2147483647)/2147483647,p=100,c=[nc(p)],bl=1e4,w=0,n=0,pk=bl,dd=0,ps=null;
+for(let i=0;i<1200;i++){p*=1+(r()-.5)*.004+Math.sin(i/60)*.0004;const k=c[c.length-1];k.c=p;k.h=Math.max(k.h,p);k.l=Math.min(k.l,p);
+if(ps&&(ps.d>0?p<=ps.sl||p>=ps.tp:p>=ps.sl||p<=ps.tp)){const x=ps.d*(p-ps.e)*ps.u;bl+=x;n++;x>0&&w++;ps=null;pk=Math.max(pk,bl);dd=Math.max(dd,(pk-bl)/pk)}
+if(i%10==9){if(!ps){const s=sig(c.map(z=>z.c));if(s){const a=atr(c);ps={d:s,e:p,sl:p-s*2*a,tp:p+s*3*a,u:bl*.01/(2*a)}}}c.push(nc(p))}}
+btr=`${n} trades • win ${n?(w/n*100).toFixed(0):0}% • P/L ${(bl-1e4).toFixed(2)} • max DD ${(dd*100).toFixed(1)}%`;$("#bo").textContent=btr}
+const V={
+dash:()=>V.d2(),
+d2:()=>order.map(k=>({mkt:['mkt',`<div class=big id=mp></div><span id=mc></span>`],trend:['trend',`<div class=big id=tr></div>`],vol:['vol',`<div class=big id=vo></div>`],sent:['sent',`<div class=big id=se></div><span class=mu id=rs></span>`],dq:['dq',`<span class=tag>DEMO</span> <span class=mu>${T('demo')}</span>`],acc:['acc',`<div class=big id=ba></div><span class=mu>Demo • <span id=bs></span></span>`],brk:['brk',['Deriv','MT5','Binance','Quotex'].map(b=>`<span class="tag x">${b}: ${T('off')}</span> `).join('')]}[k])).map(([k,b])=>`<div class=cd><h3>${T(k)}<button class=tag data-up=${k}>${T('top')}</button></h3>${b}</div>`).join(''),
+chart:()=>`<div class=cd><h3>${T('chart')} <span class=tag>DEMO</span></h3><canvas id=cv></canvas><span class=mu id=rs></span> <span class=mu>SMA20 • ATR • RSI</span></div>`,
+bot:()=>`<div class=cd><h3>${T('bot')}<span id=bs></span></h3><div class=big id=ba></div><span class=mu>P/L <span id=dp></span></span><p><button class=btn data-s=run>${T('start')}</button> <button class="btn o" data-s=pause>${T('pause')}</button> <button class="btn d" data-s=stop>${T('stop')}</button></p>
+<label class=mu>${T('ml')}<input id=iml type=number value=${ml}></label><label class=mu>${T('tg')}<input id=itg type=number value=${tg}></label><label class=mu>${T('nl')}<input id=inl type=number value=${nl}></label>
+<label class=mu><input type=checkbox id=rc style="width:auto"> ${T('real')}</label><input id=rt placeholder="${T('rl')}"><div class=mu id=rm></div></div><div class=cd><h3>${T('log')}</h3><div class=lg id=lg></div><button class="btn o" id=ex>${T('ex')}</button><textarea id=ta hidden rows=5 readonly></textarea></div>`,
+test:()=>`<div class=cd><h3>${T('test')}</h3><button class=btn id=rb>${T('run')}</button><p id=bo>${btr}</p></div>`,
+set:()=>`<div class=cd><h3>${user.e}</h3><button class="btn o" id=lt>${lang=='ar'?'English':'العربية'}</button> <button class="btn d" id=lo>${T('lo')}</button></div><div class=cd><p class=mu>${T('nb')}</p></div><div class=cd><h3>Backend</h3><input id=bu placeholder="http://192.168.1.5:8080"><input id=bk type=password placeholder="BOT_KEY"><button class=btn id=bc>Connect</button><pre class=mu id=br style="white-space:pre-wrap"></pre></div>`};
+function go(t){tab=t||tab;$("#app").innerHTML=V[tab]();$("#nv").innerHTML=['dash','chart','bot','test','set'].map(k=>`<button class="${k==tab?'on':''}" data-t=${k}>${T(k)}</button>`).join('');upd()}
+document.addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;const d=b.dataset;
+if(d.t)go(d.t);else if(d.up){order=[d.up,...order.filter(k=>k!=d.up)];sv('ord',order);go()}
+else if(d.s){rb(d.s);if(d.s=='run'&&mode!='demo'){say(T('blk'));upd();return}st=d.s;say(st);upd()}
+else if(b.id=='bc')conn();else if(b.id=='rb')bt();else if(b.id=='lt'){lang=lang=='ar'?'en':'ar';sv('lang',lang);document.documentElement.lang=lang;document.documentElement.dir=lang=='ar'?'rtl':'ltr';go()}
+else if(b.id=='lo'){user=null;sv('sess',null);location.reload()}
+else if(b.id=='ex'){$("#ta").hidden=false;$("#ta").value="time,side,entry,exit,pnl\n"+tr.map(t=>Object.values(t).join(",")).join("\n");$("#ta").select()}});
+document.addEventListener("input",e=>{const i=e.target.id;if(i=='iml')ml=+e.target.value;if(i=='itg')tg=+e.target.value;if(i=='inl')nl=+e.target.value;
+if(i=='rc'||i=='rt'){const ok=$("#rc").checked&&$("#rt").value=="REAL";mode=ok?'real':'demo';$("#rm").textContent=ok?T('blk'):""}});
+async function hs(s){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
+function auth(){$("#au").hidden=false;$("#au").innerHTML=`<div class=f><div class=big style="color:var(--c)">Trader Skill AI</div><label class=mu>${T('em')}<input id=ae type=email autocomplete=email></label><label class=mu>${T('pw')}<input id=ap type=password minlength=6 autocomplete=current-password></label><div class=r id=ar></div><button class=btn id=al>${T('li')}</button> <button class="btn o" id=ag>${T('rg')}</button></div>`;
+const go2=async n=>{const e=$("#ae").value.trim().toLowerCase(),p=$("#ap").value,u=ld('users')||{};if(!e.includes("@")||p.length<6){$("#ar").textContent=T('err');return}const h=await hs(e+p);
+if(n){if(u[e]){$("#ar").textContent=T('err');return}u[e]=h;sv('users',u)}else if(u[e]!==h){$("#ar").textContent=T('err');return}
+user={e};sv('sess',user);$("#au").hidden=true;start()};$("#al").onclick=()=>go2(0);$("#ag").onclick=()=>go2(1)}
+function start(){$("#app").hidden=false;$("#nv").hidden=false;go('dash');setInterval(tick,1000)}
+document.documentElement.lang=lang;document.documentElement.dir=lang=='ar'?'rtl':'ltr';
+setTimeout(()=>{$("#sp").style.opacity=0;setTimeout(()=>{$("#sp").remove();user?start():auth()},600)},1600);
+const hd=b=>({"X-Key":b.k});
+function rb(c){const b=ld('bk');if(b&&b.u)fetch(b.u+"/bot/"+c,{method:"POST",headers:hd(b)}).catch(()=>{})}
+async function conn(){const u=$("#bu").value.replace(/\/$/,""),k=$("#bk").value;sv('bk',{u,k});try{const j=await(await fetch(u+"/status",{headers:{"X-Key":k}})).json();$("#br").textContent=`Deriv: ${j.connected?'LIVE':'OFFLINE'} | ${j.is_virtual===false?'REAL':'DEMO'} | price ${j.price??'-'} | bot ${j.bot} | P/L ${j.pnl}\n`+j.log.slice(0,5).join("\n")}catch(e){$("#br").textContent="OFFLINE: "+e.message}}
+</script></body></html>
